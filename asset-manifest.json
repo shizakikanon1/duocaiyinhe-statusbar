@@ -1,0 +1,21 @@
+{
+  "project": "多彩银河",
+  "origin": "用户提供的角色卡 JSON 中「状态栏美化」正则的 replaceString",
+  "regex_name": "状态栏美化",
+  "regex_id": "84ed7371-35f7-4c09-abea-df5724fbba8c",
+  "source_sha256": "735477f983759eddd85723388b891552d29d2cf789580bbbf0639ce249f9cc3d",
+  "source_bytes": 42392,
+  "entry": "duocaiyinhe-statusbar-index.html",
+  "artifact_sha256": "4bdfb0e2212d70a8b2f11ea34bcace7ee2ae165917541bdf939aa326ce538edc",
+  "artifact_bytes": 42380,
+  "processing": "仅去掉外层 ```html 围栏与行尾空白；样式、脚本与结构逐字保留",
+  "loader_fence_required": true,
+  "not_included": [
+    "角色卡",
+    "世界书",
+    "开场白",
+    "首楼界面（星海大学入学登记）",
+    "选项栏",
+    "图片资源"
+  ]
+}

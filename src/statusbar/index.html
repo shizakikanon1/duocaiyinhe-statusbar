@@ -1,0 +1,1488 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --panel: rgba(32, 18, 56, 0.72);
+      --panel-2: rgba(46, 26, 78, 0.5);
+      --line: rgba(178, 138, 255, 0.22);
+      --line-soft: rgba(178, 138, 255, 0.12);
+      --pink: #ff6ec7;
+      --purple: #b388ff;
+      --text: #ece4ff;
+      --dim: #9d8cbd;
+      --ink: #7a6d99;
+
+      --font-ui: "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+      --font-title: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STZhongsong", "SimSun", Georgia, serif;
+      --font-num: ui-monospace, "Cascadia Mono", "Consolas", "SF Mono", monospace;
+
+      --mana: linear-gradient(90deg, #8b5cf6, #e879f9);
+      --joy: linear-gradient(90deg, #ffab6b, #ff6ec7);
+      --seed-m: linear-gradient(90deg, #6fd3f2, #3f8fd8);
+      --seed-f: linear-gradient(90deg, #ffc2dd, #ff7ab8);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      color: var(--text);
+      font-family: var(--font-ui);
+      font-size: 12.5px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #bar {
+      width: 100%;
+      max-width: 780px;
+      margin: 0 auto;
+      background:
+        radial-gradient(110% 58% at 8% -14%, rgba(255, 110, 199, 0.1), transparent 58%),
+        radial-gradient(100% 66% at 98% -6%, rgba(127, 220, 255, 0.07), transparent 55%),
+        linear-gradient(180deg, rgba(20, 12, 36, 0.97), rgba(11, 7, 22, 0.97));
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.42), inset 0 0 50px rgba(120, 70, 200, 0.05);
+    }
+
+    #bar[hidden] {
+      display: none !important;
+    }
+
+    .sec {
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .sec[hidden] {
+      display: none !important;
+    }
+
+    .sec:last-child {
+      border-bottom: 0;
+    }
+
+    /* 世界行 */
+    .sec.world {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 3px 8px;
+      font-size: 12px;
+      color: var(--dim);
+      letter-spacing: 0.04em;
+      padding-bottom: 5px;
+      border-bottom: 0;
+      background: linear-gradient(180deg, rgba(255, 110, 199, 0.07), rgba(255, 110, 199, 0));
+    }
+
+    .sec.world .d {
+      font-family: var(--font-num);
+      color: var(--text);
+    }
+
+    .sec.world .sep {
+      color: rgba(178, 138, 255, 0.34);
+    }
+
+    /* 头部下半：紧接世界行，用一条实一点的线跟下面的读数区划开 */
+    #whoBox {
+      padding-top: 4px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    /* 信用点：跟在日期那行的小字里，不占抽屉 */
+    .sec.world .pay {
+      letter-spacing: 0.02em;
+    }
+
+    .sec.world .pay b {
+      font-family: var(--font-num);
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    /* 身份行 */
+    .who {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+    }
+
+    .who .left {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .who .name {
+      font-family: var(--font-title);
+      font-size: 16px;
+      letter-spacing: 0.12em;
+    }
+
+    .who .sex {
+      font-size: 11px;
+      padding: 1px 7px;
+      border-radius: 4px;
+      border: 1px solid;
+      letter-spacing: 0.08em;
+      line-height: 1.5;
+    }
+
+    .who .sex.m {
+      color: #8fd0ee;
+      border-color: rgba(143, 208, 238, 0.4);
+      background: rgba(143, 208, 238, 0.09);
+    }
+
+    .who .sex.f {
+      color: #ff9ad4;
+      border-color: rgba(255, 154, 212, 0.4);
+      background: rgba(255, 154, 212, 0.09);
+    }
+
+    .who .race {
+      color: var(--dim);
+      letter-spacing: 0.06em;
+    }
+
+    .who .right {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      font-size: 12px;
+    }
+
+    .who .stage {
+      color: var(--purple);
+      letter-spacing: 0.1em;
+    }
+
+    .who .corrupt {
+      color: #ff86a8;
+      letter-spacing: 0.04em;
+    }
+
+    .who .corrupt b {
+      font-family: var(--font-num);
+      font-weight: 500;
+    }
+
+    /* 数值行 */
+    .sec.bars {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-top: 13px;
+      padding-bottom: 13px;
+    }
+
+    .bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bar .nm {
+      flex: none;
+      width: 30px;
+      font-size: 12px;
+      color: var(--dim);
+      letter-spacing: 0.08em;
+    }
+
+    .track {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+      height: 11px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.38);
+      overflow: hidden;
+    }
+
+    .track .fill {
+      display: block;
+      height: 100%;
+      border-radius: 6px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      transition: width 0.5s ease;
+    }
+
+    .fill.k-mana {
+      background: var(--mana);
+    }
+
+    .fill.k-joy {
+      background: var(--joy);
+    }
+
+    .fill.k-seed-m {
+      background: var(--seed-m);
+    }
+
+    .fill.k-seed-f {
+      background: var(--seed-f);
+    }
+
+    .track .floor {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      margin-left: -1px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .bar .num {
+      flex: none;
+      min-width: 68px;
+      text-align: right;
+      font-family: var(--font-num);
+      font-size: 12.5px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .bar .num i {
+      font-style: normal;
+      color: var(--ink);
+    }
+
+    /* 目标行 */
+    .goal {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .goal .nm {
+      position: relative;
+      flex: none;
+      font-size: 11.5px;
+      color: #d7c8f2;
+      letter-spacing: 0.08em;
+      padding-left: 11px;
+    }
+
+    .goal .nm::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.72em;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--pink);
+      box-shadow: 0 0 5px rgba(255, 110, 199, 0.8);
+    }
+
+    .goal .vv {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    /* 在场块头：做成一整条能按的边栏，右端写清「展开名单／收起名单」，
+       收起时边框转虚线，一眼看得出这里还能再打开。 */
+    .present .phd {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      appearance: none;
+      background: rgba(46, 26, 78, 0.42);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 6px 10px;
+      margin-bottom: 6px;
+      color: var(--dim);
+      font-family: var(--font-ui);
+      font-size: 11.5px;
+      letter-spacing: 0.08em;
+      text-align: left;
+      cursor: pointer;
+      transition: color 0.18s, border-color 0.18s, background 0.18s;
+    }
+
+    .present .phd:hover {
+      color: var(--text);
+      border-color: rgba(178, 138, 255, 0.45);
+      background: rgba(46, 26, 78, 0.62);
+    }
+
+    .present.shut .phd {
+      border-style: dashed;
+    }
+
+    .present .phd .cnt {
+      font-family: var(--font-num);
+      min-width: 19px;
+      padding: 0 5px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: rgba(255, 110, 199, 0.12);
+      border: 1px solid var(--line-soft);
+      color: var(--text);
+    }
+
+    .present .phd .fd {
+      margin-left: auto;
+      flex: none;
+      font-size: 10.5px;
+      letter-spacing: 0.1em;
+      color: #c8b6ee;
+      padding: 2px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(178, 138, 255, 0.08);
+      transition: color 0.18s, border-color 0.18s;
+    }
+
+    .present .phd:hover .fd {
+      color: var(--text);
+      border-color: rgba(178, 138, 255, 0.45);
+    }
+
+    .present .phd .ar {
+      flex: none;
+      font-size: 9px;
+      line-height: 1;
+      transition: transform 0.22s ease;
+      transform: rotate(90deg);
+    }
+
+    .present.shut .phd .ar {
+      transform: none;
+    }
+
+    .present.shut .plist {
+      display: none;
+    }
+
+    .plist {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .prow {
+      font-size: 12px;
+    }
+
+    .prow + .prow {
+      border-top: 1px solid var(--line-soft);
+    }
+
+    /* 单人一行：左边一条竖线，平时不亮、指上去亮紫、展开着的是粉紫渐变；
+       整行悬停再垫一层淡底，与「一个人可以点开」这件事对上。 */
+    .prow .ptop {
+      position: relative;
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 3px 9px;
+      width: 100%;
+      appearance: none;
+      background: transparent;
+      border: 0;
+      border-radius: 6px;
+      padding: 5px 0 5px 10px;
+      color: inherit;
+      font-family: var(--font-ui);
+      font-size: 12px;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.18s;
+    }
+
+    .prow .ptop::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 7px;
+      bottom: 7px;
+      width: 2px;
+      border-radius: 2px;
+      background: transparent;
+      transition: background 0.18s, box-shadow 0.18s;
+    }
+
+    .prow .ptop:hover {
+      background: rgba(178, 138, 255, 0.06);
+    }
+
+    .prow .ptop:hover::before {
+      background: var(--purple);
+      box-shadow: 0 0 6px rgba(179, 136, 255, 0.55);
+    }
+
+    .prow.on .ptop::before {
+      background: linear-gradient(180deg, var(--pink), var(--purple));
+      box-shadow: 0 0 6px rgba(255, 110, 199, 0.5);
+    }
+
+    .prow .pn {
+      letter-spacing: 0.05em;
+    }
+
+    .prow .pt {
+      color: var(--dim);
+    }
+
+    .prow .pd {
+      color: var(--ink);
+    }
+
+    .prow .pd b {
+      font-family: var(--font-num);
+      font-weight: 500;
+      color: var(--dim);
+    }
+
+    /* 右端那颗牌子：收起时写「详情」，展开后写「收起」并转成粉色 */
+    .prow .ptop .ptog {
+      margin-left: auto;
+      flex: none;
+      align-self: center;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .prow .ptop .fd {
+      font-size: 10.5px;
+      letter-spacing: 0.1em;
+      color: #c8b6ee;
+      padding: 2px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(178, 138, 255, 0.08);
+      transition: color 0.18s, border-color 0.18s, background 0.18s;
+    }
+
+    .prow .ptop:hover .fd {
+      color: var(--text);
+      border-color: rgba(178, 138, 255, 0.45);
+    }
+
+    .prow.on .ptop .fd {
+      color: var(--pink);
+      border-color: rgba(255, 110, 199, 0.45);
+      background: rgba(255, 110, 199, 0.1);
+    }
+
+    .prow .ptop .ar {
+      font-size: 9px;
+      line-height: 1;
+      color: rgba(157, 140, 189, 0.6);
+      transition: transform 0.22s ease;
+    }
+
+    .prow.on .ptop .ar {
+      transform: rotate(90deg);
+    }
+
+    .prow .pdet {
+      display: none;
+      margin: 0 0 6px 10px;
+      padding: 8px 10px 5px 12px;
+      border-left: 1px solid var(--line);
+      border-radius: 0 6px 6px 0;
+      background: rgba(20, 12, 36, 0.3);
+    }
+
+    .prow.on .pdet {
+      display: block;
+    }
+
+    .prow .pdet .grp {
+      gap: 4px 9px;
+      margin-bottom: 0;
+    }
+
+    .prow .pdet .k {
+      font-size: 11px;
+      color: #d7c8f2;
+    }
+
+    .prow .pdet .v {
+      font-size: 11.5px;
+      line-height: 1.7;
+      color: var(--dim);
+    }
+
+    /* 四个栏目 */
+    .drawers {
+      padding: 0;
+      background: rgba(0, 0, 0, 0.14);
+      border-top: 1px solid var(--line-soft);
+    }
+
+    .dtabs {
+      display: flex;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .dtab {
+      flex: 1;
+      appearance: none;
+      background: transparent;
+      border: 0;
+      border-right: 1px solid var(--line-soft);
+      color: var(--dim);
+      font-family: var(--font-ui);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      padding: 9px 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .dtab:last-child {
+      border-right: 0;
+    }
+
+    .dtab:hover {
+      color: var(--text);
+      background: rgba(178, 138, 255, 0.06);
+    }
+
+    .dtab.on {
+      color: var(--pink);
+      background: rgba(255, 110, 199, 0.1);
+      box-shadow: inset 0 -2px 0 var(--pink);
+    }
+
+    .dtab .ar {
+      font-size: 10px;
+      line-height: 1;
+      transition: transform 0.22s ease;
+    }
+
+    .dtab.on .ar {
+      transform: rotate(90deg);
+    }
+
+    .dtab.off {
+      color: rgba(157, 140, 189, 0.38);
+      cursor: default;
+    }
+
+    .dtab.off:hover {
+      color: rgba(157, 140, 189, 0.38);
+      background: transparent;
+    }
+
+    .dpane {
+      display: none;
+      padding: 12px 16px;
+    }
+
+    .dpane.on {
+      display: block;
+      animation: drop 0.22s ease;
+    }
+
+    @keyframes drop {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* 栏目里的键值网格 */
+    .grp {
+      display: grid;
+      grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+      gap: 6px 10px;
+      align-items: baseline;
+      margin-bottom: 12px;
+    }
+
+    .grp:last-child {
+      margin-bottom: 0;
+    }
+
+    /* 子栏：左侧一道渐变亮条，标题往右渐隐铺一层底色，底下一根细线收口。
+       每个分组都长这样，不再有「有的有标题、有的没有」的情况。 */
+    .grp > .gt {
+      grid-column: 1 / -1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      font-size: 11.5px;
+      color: #d9c3ff;
+      letter-spacing: 0.16em;
+      padding: 3px 0 6px 11px;
+      margin-bottom: 3px;
+      border-bottom: 1px solid var(--line-soft);
+      background: linear-gradient(
+        90deg,
+        rgba(255, 110, 199, 0.14),
+        rgba(179, 136, 255, 0.06) 48%,
+        transparent 84%
+      );
+      border-radius: 2px 0 0 0;
+    }
+
+    .grp > .gt::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      width: 3px;
+      height: 13px;
+      margin-top: -6px;
+      border-radius: 2px;
+      background: linear-gradient(180deg, var(--pink), var(--purple));
+      box-shadow: 0 0 7px rgba(255, 110, 199, 0.6);
+    }
+
+    /* 字段名：前面一颗会发光的点，颜色比正文暗一档但不灰，跟值拉开层次 */
+    .k {
+      position: relative;
+      min-width: 0;
+      color: #d7c8f2;
+      font-size: 11.5px;
+      letter-spacing: 0.08em;
+      padding-left: 11px;
+      overflow-wrap: anywhere;
+    }
+
+    .k::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.72em;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--pink);
+      box-shadow: 0 0 5px rgba(255, 110, 199, 0.8);
+    }
+
+    .v {
+      min-width: 0;
+      overflow-wrap: anywhere;
+      line-height: 1.85;
+    }
+
+    /* 整行值（学籍这种只有一个值的）与课表网格，都在分组里跨满整行 */
+    .grp > .gv {
+      grid-column: 1 / -1;
+      color: var(--text);
+      letter-spacing: 0.04em;
+      line-height: 1.8;
+    }
+
+    .grp > .grid {
+      grid-column: 1 / -1;
+    }
+
+    .grp > .self {
+      grid-column: 1 / -1;
+      border-left: 2px solid rgba(255, 110, 199, 0.42);
+      padding: 2px 0 2px 10px;
+      font-family: var(--font-title);
+      font-size: 12.5px;
+      line-height: 1.95;
+      letter-spacing: 0.05em;
+    }
+
+    /* 课表网格：七列（段名 ＋ 六天）× 七行（表头 ＋ 三段各两节） */
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 34px) repeat(6, minmax(0, 1fr));
+      gap: 3px;
+      margin-bottom: 12px;
+    }
+
+    .grid .cn {
+      font-size: 10.5px;
+      line-height: 1.9;
+      color: var(--ink);
+      letter-spacing: 0.08em;
+      text-align: center;
+    }
+
+    .grid .cc {
+      min-width: 0;
+      padding: 3px 4px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.035);
+      font-size: 10.5px;
+      line-height: 1.45;
+      color: var(--dim);
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .grid .cc.on {
+      color: var(--text);
+      background: rgba(178, 138, 255, 0.16);
+      border: 1px solid rgba(178, 138, 255, 0.32);
+    }
+
+    /* 今天那一列：表头亮起来带一点辉光，整列垫一层淡底 */
+    .grid .cn.today {
+      color: var(--pink);
+      text-shadow: 0 0 9px rgba(255, 110, 199, 0.7);
+    }
+
+    .grid .cc.today {
+      background: rgba(255, 110, 199, 0.07);
+    }
+
+    .grid .cc.on.today {
+      background: rgba(178, 138, 255, 0.24);
+      border-color: rgba(255, 110, 199, 0.48);
+    }
+
+    /* 学籍那一行 */
+    .grow {
+      grid-column: 1 / -1;
+      font-size: 12px;
+      color: var(--dim);
+      letter-spacing: 0.04em;
+    }
+
+    /* 有淫能资质：这道条和身体是通的。条上走一道很慢的光，名字旁留一点。
+       没资质就什么都不加——不是没有淫能，只是不那么顺手 */
+    #bar.gifted .fill.k-mana {
+      position: relative;
+      overflow: hidden;
+    }
+
+    #bar.gifted .fill.k-mana::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(100deg, transparent 32%, rgba(255, 255, 255, 0.62) 50%, transparent 68%);
+      background-size: 240% 100%;
+      animation: 资质流转 3.4s linear infinite;
+    }
+
+    @keyframes 资质流转 {
+      from { background-position: 170% 0; }
+      to { background-position: -70% 0; }
+    }
+
+    .gift {
+      display: inline-block;
+      width: 5px;
+      height: 5px;
+      margin-left: 6px;
+      border-radius: 50%;
+      vertical-align: middle;
+      background: var(--pink);
+      box-shadow: 0 0 7px rgba(232, 121, 249, 0.95), 0 0 2px rgba(255, 255, 255, 0.8);
+      animation: 资质呼吸 2.8s ease-in-out infinite;
+    }
+
+    @keyframes 资质呼吸 {
+      0%, 100% { opacity: 0.42; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.1); }
+    }
+
+    /* 手机上别让动效晃眼，也省点电 */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
+    }
+
+    /* 窄屏：手指点得中，长名单给高一点 */
+    @media (max-width: 480px) {
+      .sec {
+        padding: 10px 12px;
+      }
+
+      .bar .nm {
+        width: 26px;
+      }
+
+      .bar .num {
+        min-width: 58px;
+        font-size: 11.5px;
+      }
+
+      .dtab {
+        font-size: 11.5px;
+        letter-spacing: 0.06em;
+        padding: 11px 4px;
+      }
+
+      .dpane {
+        padding: 11px 12px;
+      }
+    }
+
+    /* 小屏手机：三条数值条最容易被挤坏，单独再收一轮 */
+    @media (max-width: 360px) {
+      .sec {
+        padding: 9px 10px;
+      }
+
+      .who .name {
+        font-size: 15px;
+      }
+
+      .grid {
+        grid-template-columns: minmax(0, 26px) repeat(6, minmax(0, 1fr));
+        gap: 2px;
+      }
+
+      .grid .cc,
+      .grid .cn {
+        font-size: 9.5px;
+      }
+
+      .bar {
+        gap: 7px;
+      }
+
+      .bar .nm {
+        width: 24px;
+        font-size: 11px;
+      }
+
+      .bar .num {
+        min-width: 50px;
+        font-size: 10.5px;
+      }
+
+      .track {
+        height: 10px;
+      }
+
+      .dtab {
+        font-size: 11px;
+        letter-spacing: 0;
+        padding: 10px 2px;
+        gap: 3px;
+      }
+
+      .dpane {
+        padding: 10px 10px;
+      }
+
+      .grp {
+        gap: 5px 8px;
+      }
+    }
+  </style>
+
+  <script type="module">
+    /* 开合状态只记在本地，翻页重画还在；存不住也不影响这一次。 */
+    const 存键 = '星海大学_栏目';
+
+    /* 这一楼的变量，每次重画换一次。 */
+    let 全量 = {};
+
+    const 净 = (值) => {
+      const 文 = String(值 === undefined || 值 === null ? '' : 值).trim();
+      return 文 === '待初始化' ? '' : 文;
+    };
+
+    const 转义 = (文) =>
+      String(文).replace(/[&<>"]/g, (字) => {
+        if (字 === '&') return '&amp;';
+        if (字 === '<') return '&lt;';
+        if (字 === '>') return '&gt;';
+        return '&quot;';
+      });
+
+    const 数 = (值, 兜底) => {
+      const 收 = Number(值);
+      return Number.isFinite(收) ? 收 : 兜底;
+    };
+
+    const 夹 = (值, 低, 高) => Math.max(低, Math.min(高, 值));
+
+    const 表 = (值) => (值 && typeof 值 === 'object' && !Array.isArray(值) ? 值 : {});
+
+    /* 读一个字段：路径一律以 stat_data. 打头，缺了就返回兜底。 */
+    const 读 = (路, 兜底) => {
+      const 得 = _.get(全量, 'stat_data.' + 路);
+      return 得 === undefined || 得 === null ? 兜底 : 得;
+    };
+
+    /* 读一整张映射表；不是对象就当成空的。 */
+    const 读表 = (路) => 表(读(路, {}));
+
+    /* 姓名里可能是 {{user}} 字面量，交给酒馆换掉；换不动就照原样写。 */
+    const 洗名 = (值) => {
+      const 文 = 净(值);
+      if (!文 || 文.indexOf('{{') === -1) return 文;
+      try {
+        if (typeof substitudeMacros === 'function') return 净(substitudeMacros(文)) || 文;
+      } catch (错) {
+        return 文;
+      }
+      return 文;
+    };
+
+    const 雌堕档 = (值) => {
+      if (值 <= 19) return '混乱适应　0–19';
+      if (值 <= 39) return '本能觉醒　20–39';
+      if (值 <= 59) return '半推半就　40–59';
+      if (值 <= 79) return '深度沉沦　60–79';
+      return '完全雌堕　80–100';
+    };
+
+    const 读开 = () => {
+      try {
+        const 存 = JSON.parse(window.localStorage.getItem(存键) || '[]');
+        return Array.isArray(存) ? 存 : [];
+      } catch (错) {
+        return [];
+      }
+    };
+
+    const 写开 = (列) => {
+      try {
+        window.localStorage.setItem(存键, JSON.stringify(列));
+      } catch (错) {
+        return;
+      }
+    };
+
+    /* 在场那一块：哪几个人点开了、整块收没收，也记在本地。 */
+    const 存键在场 = '星海大学_在场';
+    let 场状 = null;
+    let 场名 = [];
+
+    const 取场状 = () => {
+      if (场状) return 场状;
+      场状 = { 开: true, 人: [] };
+      try {
+        const 存 = JSON.parse(window.localStorage.getItem(存键在场) || 'null');
+        if (存 && typeof 存 === 'object' && !Array.isArray(存)) {
+          场状 = { 开: 存.开 !== false, 人: Array.isArray(存.人) ? 存.人 : [] };
+        }
+      } catch (错) {
+        return 场状;
+      }
+      return 场状;
+    };
+
+    const 写在场 = () => {
+      try {
+        window.localStorage.setItem(存键在场, JSON.stringify(取场状()));
+      } catch (错) {
+        return;
+      }
+    };
+
+    /* 点名字那一行是展开这个人，点「在场」那一行是收起整块。 */
+    const 切在场 = (事) => {
+      const 标 = 事 && 事.target;
+      if (!标 || typeof 标.closest !== 'function') return;
+      const 状 = 取场状();
+      if (标.closest('.phd')) {
+        状.开 = !状.开;
+        写在场();
+        画();
+        return;
+      }
+      const 钮 = 标.closest('.ptop');
+      if (!钮) return;
+      const 条 = 钮.closest('.prow');
+      const 名 = 条 ? 场名[Number(条.getAttribute('data-i'))] : '';
+      if (!名) return;
+      const 位 = 状.人.indexOf(名);
+      if (位 >= 0) 状.人.splice(位, 1);
+      else 状.人.push(名);
+      写在场();
+      画();
+    };
+
+    const 显 = (标, 亮) => {
+      const 节 = document.getElementById(标);
+      if (节) 节.hidden = !亮;
+    };
+
+    const 行 = (名, 值) =>
+      '<span class="k">' + 转义(名) + '</span><span class="v">' + 转义(值) + '</span>';
+
+    /* 一条进度；给了下限就在那个位置画一道线标出来。 */
+    const 画条 = (名, 值, 上限, 色, 下限) => {
+      const 宽 = 夹((值 / 上限) * 100, 0, 100).toFixed(2);
+      let 线 = '';
+      if (typeof 下限 === 'number') {
+        const 位 = 夹((下限 / 上限) * 100, 0, 100).toFixed(2);
+        线 = '<span class="floor" style="left:' + 位 + '%"></span>';
+      }
+      return (
+        '<div class="bar">' +
+        '<span class="nm">' +
+        名 +
+        '</span>' +
+        '<span class="track"><b class="fill ' +
+        色 +
+        '" style="width:' +
+        宽 +
+        '%"></b>' +
+        线 +
+        '</span>' +
+        '<span class="num">' +
+        值 +
+        ' <i>/ ' +
+        上限 +
+        '</i></span>' +
+        '</div>'
+      );
+    };
+
+    const 画此刻 = () => {
+      let 出 = '';
+
+      /* 想法、人设、穿着三样连着读，放在这一栏最上面 */
+      const 块 = [];
+      const 心 = 净(读('主角.心理活动', ''));
+      if (心) 块.push('<span class="self">' + 转义(心) + '</span>');
+      const 性 = 净(读('主角.个人性格', ''));
+      if (性) 块.push(行('人设', 性));
+      const 衣 = 净(读('主角.服饰外观', ''));
+      if (衣) 块.push(行('穿着', 衣));
+      if (块.length) 出 += '<div class="grp"><span class="gt">本人</span>' + 块.join('') + '</div>';
+
+      /* 临时状态排在后面：它是会来会走的一串，空着就不画，不打断上面那三样 */
+      const 状 = 读表('主角.当前状态');
+      const 状列 = [];
+      for (const 名 of Object.keys(状)) {
+        const 值 = 净(状[名]);
+        if (值) 状列.push(行(名, 值));
+      }
+      if (状列.length) {
+        出 += '<div class="grp"><span class="gt">当前状态</span>' + 状列.join('') + '</div>';
+      }
+
+      return 出;
+    };
+
+    const 画身体 = () => {
+      const 块 = [];
+      const 私 = 读表('主角.私密状态');
+      for (const 名 of ['胸部', '小穴', '子宫', '肛门', '阳具']) {
+        const 值 = 净(私[名]);
+        if (值 && 值 !== '无') 块.push(行(名, 值));
+      }
+      let 出 = 块.length ? '<div class="grp"><span class="gt">私密状态</span>' + 块.join('') + '</div>' : '';
+
+      const 特 = 读表('主角.特写部位');
+      const 特列 = [];
+      for (const 名 of Object.keys(特)) {
+        const 值 = 净(特[名]);
+        if (值) 特列.push(行(名, 值));
+      }
+      if (特列.length) {
+        出 += '<div class="grp"><span class="gt">特写部位</span>' + 特列.join('') + '</div>';
+      }
+      return 出;
+    };
+
+    const 画关系 = () => {
+      let 出 = '';
+      const 甲 = 读表('主角.身份');
+      const 甲列 = [];
+      for (const 名 of Object.keys(甲)) {
+        const 值 = 净(甲[名]);
+        if (值) 甲列.push(行(名, 值));
+      }
+      if (甲列.length) 出 += '<div class="grp"><span class="gt">身份</span>' + 甲列.join('') + '</div>';
+
+      const 乙 = 读表('主角.社会契约');
+      const 乙列 = [];
+      for (const 名 of Object.keys(乙)) {
+        const 值 = 净(乙[名]);
+        if (值) 乙列.push(行(名, 值));
+      }
+      if (乙列.length) 出 += '<div class="grp"><span class="gt">社会契约</span>' + 乙列.join('') + '</div>';
+      return 出;
+    };
+
+    const 画随身 = () => {
+      let 出 = '';
+      const 物 = 读表('主角.物品栏');
+      const 物列 = [];
+      for (const 名 of Object.keys(物)) {
+        const 项 = 表(物[名]);
+        const 份 = Math.max(0, Math.round(数(项.数量, 1)));
+        const 说 = 净(项.说明);
+        if (份 <= 0 && !说) continue;
+        物列.push(行(份 > 1 ? 名 + '　×' + 份 : 名, 说));
+      }
+      if (物列.length) {
+        出 += '<div class="grp"><span class="gt">物品栏</span>' + 物列.join('') + '</div>';
+      }
+
+      const 知 = 读表('主角.淫能知识');
+      const 知列 = [];
+      /* 0 阶就是还没学会，不算信息——否则这一栏永远亮着两行 0 阶 */
+      const 施 = 夹(Math.round(数(知.施法阶数, 0)), 0, 5);
+      const 淬 = 夹(Math.round(数(知.淬精术阶数, 0)), 0, 4);
+      if (施 > 0) 知列.push(行('施法', 施 + ' 阶'));
+      if (淬 > 0) 知列.push(行('淬精术', 淬 + ' 阶'));
+      const 法 = 表(知.已掌握法术);
+      for (const 名 of Object.keys(法)) {
+        const 项 = 表(法[名]);
+        const 低 = 夹(Math.round(数(项.最低阶, 1)), 1, 9);
+        const 高 = 夹(Math.round(数(项.最高阶, 低)), 低, 9);
+        const 说 = 净(项.说明);
+        const 阶文 = 低 === 高 ? 低 + ' 阶' : 低 + '–' + 高 + ' 阶';
+        知列.push(行(名, 阶文 + (说 ? '　' + 说 : '')));
+      }
+      if (知列.length) {
+        出 += '<div class="grp"><span class="gt">淫能知识</span>' + 知列.join('') + '</div>';
+      }
+      return 出;
+    };
+
+    /* 课表网格：六天 × 三段 × 两节，共 36 个位置，有课的格子写课名。
+       值与向导那边同一套格式（「周一上午第一节」），按位置切；认不出就原样列在后面。 */
+    const 课表天名 = ['周一', '周二', '周三', '周四', '周五', '周六'];
+    const 课表段名 = ['上午', '下午', '晚间'];
+    const 课表节名 = ['第一节', '第二节'];
+
+    const 格位 = (名) => {
+      const 文 = String(名 == null ? '' : 名);
+      const 天 = 课表天名.indexOf(文.slice(0, 2));
+      const 段 = 课表段名.indexOf(文.slice(2, 4));
+      const 节 = 课表节名.indexOf(文.slice(4));
+      return 天 >= 0 && 段 >= 0 && 节 >= 0 ? [天, 段, 节] : null;
+    };
+
+    const 画学业 = () => {
+      const 年级 = 净(读('主角.年级', ''));
+      const 学院 = 净(读('主角.学院', ''));
+      const 学籍 = [年级, 学院].filter(Boolean).join(' · ');
+      let 出 = 学籍 ? '<div class="grp"><span class="gt">学籍</span><span class="gv">' + 转义(学籍) + '</span></div>' : '';
+
+      const 课 = 读表('主角.课表');
+      const 名 = Object.keys(课);
+      if (!名.length) return 出;
+
+      const 格 = {};
+      const 认不出 = [];
+      for (const 课名 of 名) {
+        const 位 = 格位(课[课名]);
+        if (位) {
+          const 键 = 位.join('-');
+          (格[键] = 格[键] || []).push(课名);
+        } else {
+          const 值 = 净(课[课名]);
+          /* 「假期中」的值是空的，照样要显示；其余认不出的原样列在后面 */
+          认不出.push(值 ? 课名 + '　' + 值 : 课名);
+        }
+      }
+
+      /* 今天那一列打个光：世界.星期 指到哪一列，那一列就亮 */
+      const 今 = 课表天名.indexOf(净(读('世界.星期', '')));
+      const 行们 = ['<span class="cn"></span>', ...课表天名.map((天, 号) => '<span class="cn' + (号 === 今 ? ' today' : '') + '">' + 天 + '</span>')];
+      课表段名.forEach((段, 段号) => {
+        课表节名.forEach((节, 节号) => {
+          行们.push('<span class="cn">' + (节号 === 0 ? 段 : '') + '</span>');
+          for (let 天号 = 0; 天号 < 课表天名.length; 天号++) {
+            const 占 = 格[天号 + '-' + 段号 + '-' + 节号] || [];
+            const 今类 = 天号 === 今 ? ' today' : '';
+            if (!占.length) {
+              行们.push('<span class="cc' + 今类 + '"></span>');
+              continue;
+            }
+            const 余 = 占.length > 1 ? ' +' + (占.length - 1) : '';
+            行们.push(
+              '<span class="cc on' + 今类 + '" title="' + 转义(占.join('、')) + '">' + 转义(占[0]) + 余 + '</span>',
+            );
+          }
+        });
+      });
+      const 课内 = [];
+      if (Object.keys(格).length) 课内.push('<div class="grid">' + 行们.join('') + '</div>');
+      for (const 文 of 认不出) 课内.push('<span class="gv">' + 转义(文) + '</span>');
+      if (课内.length) 出 += '<div class="grp"><span class="gt">课表</span>' + 课内.join('') + '</div>';
+      return 出;
+    };
+
+    const 栏目名 = ['此刻', '身体', '关系', '随身', '学业'];
+
+    const 画 = () => {
+      const 壳 = document.getElementById('bar');
+      if (!壳) return;
+
+      try {
+        全量 = getAllVariables() || {};
+      } catch (错) {
+        全量 = {};
+      }
+
+      if (!全量.stat_data || typeof 全量.stat_data !== 'object') {
+        壳.hidden = true;
+        return;
+      }
+
+      /* 资质是开场定死、此后不改的天赋值；缺省按「无」走，与多阶段人设的兜底一致 */
+      const 资质 = 读('主角.淫能资质', false) === true;
+      壳.className = 资质 ? 'gifted' : '';
+
+      /* 世界行 */
+      const 时段 = [];
+      const 日 = 净(读('世界.日期', ''));
+      const 星 = 净(读('世界.星期', ''));
+      const 时 = 净(读('世界.时间', ''));
+      const 天 = 净(读('世界.天气', ''));
+      const 地 = 净(读('世界.地点', ''));
+      /* 星期跟在日期后面，与课表的「周一上午第一节」对得上 */
+      if (日) 时段.push('<span class="d">' + 转义(日) + (星 ? ' ' + 转义(星) : '') + '</span>');
+      if (时) 时段.push('<span class="d">' + 转义(时) + '</span>');
+      if (天) 时段.push('<span>' + 转义(天) + '</span>');
+      if (地) 时段.push('<span>' + 转义(地) + '</span>');
+      /* 信用点挂在最上面这行的小字里，不占抽屉；读不到就不画 */
+      const 钱文 = 净(读('主角.信用点', ''));
+      if (钱文) {
+        const 钱 = Math.max(0, Math.round(数(钱文, 0)));
+        时段.push(
+          '<span class="pay">信用点 <b>' + String(钱).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '</b></span>',
+        );
+      }
+      document.getElementById('world').innerHTML = 时段.join('<span class="sep">·</span>');
+      显('world', 时段.length > 0);
+
+      /* 身份行 */
+      const 名 = 洗名(读('主角.姓名', ''));
+      const 性别文 = 净(读('主角.性别', ''));
+      const 女 = 性别文 === '女';
+      const 性待 = 性别文 === '待定';
+      const 类 = 净(读('主角.种族类别', ''));
+      const 族 = 净(读('主角.种族', ''));
+      const 族文 = 类 && 族 ? 类 + '·' + 族 : 类 || 族;
+
+      let 左 = '';
+      if (名) 左 += '<span class="name">' + 转义(名) + '</span>' + (资质 ? '<span class="gift" title="淫能资质"></span>' : '');
+      左 += '<span class="sex ' + (女 ? 'f' : 'm') + '">' + (性待 ? '待定' : 女 ? '女' : '男') + '</span>';
+      if (族文) 左 += '<span class="race">' + 转义(族文) + '</span>';
+
+      let 右 = '';
+      if (女) {
+        const 阶 = 净(读('主角.女性精神阶段', ''));
+        if (阶 && 阶 !== '无') 右 += '<span class="stage">' + 转义(阶) + '</span>';
+        const 雌 = 夹(Math.round(数(读('主角.雌堕程度', 0), 0)), 0, 100);
+        右 += '<span class="corrupt" title="' + 雌堕档(雌) + '">雌堕 <b>' + 雌 + '</b></span>';
+      }
+
+      document.getElementById('who').innerHTML =
+        '<span class="left">' + 左 + '</span>' + (右 ? '<span class="right">' + 右 + '</span>' : '');
+
+      /* 数值行 */
+      const 淫 = 夹(Math.round(数(读('主角.淫能存量', 0), 0)), 0, 99);
+      const 快 = 夹(Math.round(数(读('主角.快感值', 0), 0)), 0, 100);
+      const 精上 = 女 ? 10 : 3;
+      const 精 = 夹(Math.round(数(读('主角.精液存量', 0), 0)), 0, 精上);
+      document.getElementById('bars').innerHTML =
+        画条('淫能', 淫, 99, 'k-mana') +
+        画条('快感', 快, 100, 'k-joy', 淫) +
+        画条('精液', 精, 精上, 女 ? 'k-seed-f' : 'k-seed-m');
+
+      /* 目标行 */
+      const 目 = 净(读('世界.当前目标', ''));
+      document.getElementById('goal').innerHTML = 目
+        ? '<span class="nm">当前目标</span><span class="vv">' + 转义(目) + '</span>'
+        : '';
+      显('goalBox', !!目);
+
+      /* 在场行：一个人一条，点名字那一行看详情，点「在场」那一行收起整块。 */
+      const 在场 = 读表('在场角色');
+      const 名单 = Object.keys(在场);
+      场名 = 名单;
+      const 场状 = 取场状();
+
+      const 在场文 = 名单.map((名号, 号) => {
+        const 人 = 表(在场[名号]);
+        /* 「待定」也按女性走，与向导那边的夹同伴口径一致 */
+        const 人女 = 净(人.性别) !== '男';
+        const 人上 = 人女 ? 10 : 3;
+        const 人精 = 夹(Math.round(数(人.精液存量, 0)), 0, 人上);
+        const 人族 = 净(人.种族);
+
+        let 头 = '<span class="pn">' + 转义(名号) + '</span>';
+        if (人族) 头 += '<span class="pt">' + 转义(人族) + '</span>';
+        头 += '<span class="pd">精液 <b>' + 人精 + '</b></span>';
+        if (人女) {
+          const 人雌 = 夹(Math.round(数(人.雌堕程度, 0)), 0, 100);
+          头 += '<span class="pd" title="' + 雌堕档(人雌) + '">雌堕 <b>' + 人雌 + '</b></span>';
+        }
+
+        /* 详情：学籍、性情、外观、心事、特写、法术——有值才拼，一条一行 */
+        const 细 = [];
+        const 学年 = [净(人.年级), 净(人.学院)].filter(Boolean).join(' · ');
+        if (学年) 细.push(行('学籍', 学年));
+        const 性 = 净(人.个人性格);
+        if (性) 细.push(行('性格', 性));
+        const 观 = 净(人.服饰外观);
+        if (观) 细.push(行('外观', 观));
+        const 心 = 净(人.心理活动);
+        if (心) 细.push(行('心事', 心));
+        const 人特 = 表(人.特写部位);
+        for (const 部名 of Object.keys(人特)) {
+          const 部值 = 净(人特[部名]);
+          if (部值) 细.push(行(部名, 部值));
+        }
+        const 人知 = 表(人.淫能知识);
+        const 人施 = 夹(Math.round(数(人知.施法阶数, 0)), 0, 5);
+        const 人淬 = 夹(Math.round(数(人知.淬精术阶数, 0)), 0, 4);
+        if (人施 > 0) 细.push(行('施法', 人施 + ' 阶'));
+        if (人淬 > 0) 细.push(行('淬精术', 人淬 + ' 阶'));
+
+        const 开 = 细.length > 0 && 场状.人.indexOf(名号) >= 0;
+        return (
+          '<div class="prow' +
+          (开 ? ' on' : '') +
+          '" data-i="' +
+          号 +
+          '">' +
+          '<button type="button" class="ptop">' +
+          头 +
+          (细.length
+            ? '<span class="ptog"><span class="fd">' + (开 ? '收起' : '详情') + '</span><span class="ar">▸</span></span>'
+            : '') +
+          '</button>' +
+          (细.length ? '<div class="pdet"><div class="grp">' + 细.join('') + '</div></div>' : '') +
+          '</div>'
+        );
+      });
+
+      const 场壳 = document.getElementById('present');
+      场壳.innerHTML = 名单.length
+        ? '<button type="button" class="phd"><span class="hd">在场</span><span class="cnt">' +
+          名单.length +
+          '</span><span class="fd">' +
+          (场状.开 ? '收起名单' : '展开名单') +
+          '</span><span class="ar">▸</span></button><div class="plist">' +
+          在场文.join('') +
+          '</div>'
+        : '';
+      场壳.className = 'present' + (场状.开 ? '' : ' shut');
+      显('presentBox', 名单.length > 0);
+
+      /* 四个栏目 */
+      const 内容 = {
+        此刻: 画此刻(),
+        身体: 画身体(),
+        关系: 画关系(),
+        随身: 画随身(),
+        学业: 画学业(),
+      };
+      const 开着 = 读开().filter((名) => 内容[名]);
+
+      document.getElementById('dtabs').innerHTML = 栏目名
+        .map((名) => {
+          const 空 = !内容[名];
+          return (
+            '<button type="button" class="dtab' +
+            (开着.indexOf(名) >= 0 ? ' on' : '') +
+            (空 ? ' off' : '') +
+            '" data-k="' +
+            名 +
+            '"' +
+            (空 ? ' disabled' : '') +
+            '>' +
+            名 +
+            '<span class="ar">▸</span>' +
+            '</button>'
+          );
+        })
+        .join('');
+
+      document.getElementById('dpanes').innerHTML = 栏目名
+        .map(
+          (名) =>
+            '<div class="dpane' +
+            (开着.indexOf(名) >= 0 ? ' on' : '') +
+            '" data-k="' +
+            名 +
+            '">' +
+            (内容[名] || '') +
+            '</div>',
+        )
+        .join('');
+
+      壳.hidden = false;
+    };
+
+    /* 监听挂在外层，重画只换子节点，不会把监听一起换掉。 */
+    const 挂 = () => {
+      const 头 = document.getElementById('dtabs');
+      if (头) {
+        头.addEventListener('click', (事) => {
+          const 钮 = 事.target && 事.target.closest ? 事.target.closest('.dtab') : null;
+          if (!钮 || 钮.disabled || 钮.classList.contains('off')) return;
+          const 名 = String(钮.getAttribute('data-k') || '');
+          const 面 = document.querySelector('#dpanes .dpane[data-k="' + 名 + '"]');
+          const 开 = !钮.classList.contains('on');
+          钮.classList.toggle('on', 开);
+          if (面) 面.classList.toggle('on', 开);
+          const 列 = [];
+          for (const 亮 of 头.querySelectorAll('.dtab.on')) {
+            列.push(String(亮.getAttribute('data-k') || ''));
+          }
+          写开(列);
+        });
+      }
+      const 场 = document.getElementById('present');
+      if (场) 场.addEventListener('click', 切在场);
+    };
+
+    async function init() {
+      await waitGlobalInitialized('Mvu');
+      画();
+      挂();
+      eventOn(Mvu.events.VARIABLE_UPDATE_ENDED, () => {
+        画();
+      });
+    }
+
+    $(errorCatched(init));
+  </script>
+</head>
+<body>
+  <div id="bar" hidden>
+    <div class="sec world" id="world"></div>
+    <div class="sec" id="whoBox"><div class="who" id="who"></div></div>
+    <div class="sec bars" id="bars"></div>
+    <div class="sec" id="goalBox"><div class="goal" id="goal"></div></div>
+    <div class="sec" id="presentBox"><div class="present" id="present"></div></div>
+    <div class="sec drawers">
+      <div class="dtabs" id="dtabs"></div>
+      <div class="dpanes" id="dpanes"></div>
+    </div>
+  </div>
+</body>
+</html>
